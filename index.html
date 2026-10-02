@@ -15,7 +15,7 @@ main{max-width:1280px;margin:0 auto;padding:20px 4vw 50px}
 .bar{display:flex;flex-wrap:wrap;gap:12px;align-items:end;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 16px;margin-bottom:16px;position:sticky;top:8px;z-index:5;box-shadow:0 4px 14px #1f38641a}
 .bar label{display:flex;flex-direction:column;font-size:11px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.04em;gap:4px}
 .bar input,.bar select{font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;min-width:150px}
-#meta{width:90px;min-width:0;font-weight:700;color:var(--navy);background:#fffbd6;border-color:#e0c800}
+#q{min-width:260px;max-width:340px}#meta{width:90px;min-width:0;font-weight:700;color:var(--navy);background:#fffbd6;border-color:#e0c800}
 button{font:inherit;padding:8px 14px;border:0;border-radius:8px;background:var(--blue);color:#fff;font-weight:600;cursor:pointer}button:hover{background:var(--navy)}
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:12px;margin-bottom:16px}
 .kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 15px;border-top:4px solid var(--blue)}
@@ -51,7 +51,7 @@ footer{text-align:center;color:var(--mut);font-size:12px;margin-top:20px}
 <main>
 <div class="bar">
 <label>Meta URE (%)<input id="meta" type="number" step="0.5" min="0" max="100" value="51"></label>
-<label>Buscar escola<input id="q" placeholder="digite o nome…"></label>
+<label>Escola<select id="q"><option value="">Todas as escolas</option></select></label>
 <label>Situação<select id="sit"><option value="">Todas</option><option value="0">Acima da Meta</option><option value="1">Próxima da Meta</option><option value="2">Atenção</option><option value="3">Alta Prioridade</option></select></label>
 <label>Base de análise<select id="comp"></select></label>
 <button id="reset">Limpar filtros</button></div>
@@ -115,7 +115,7 @@ function render(){
  const base=st.comp==="geral"?"Geral":D.comps[+st.comp];
  $("#kpis").innerHTML=kpi("Resultado URE — "+base,pc(ure))+kpi("Meta URE",pc(m))+kpi("Gap para a meta",pc(Math.max(0,m-ure)))+
   kpi("Avanço relativo necessário",pc(Math.max(0,m-ure)/ure))+kpi("Alunos representados",T.toLocaleString(N))+kpi("Escolas abaixo da meta",ord.length+" de "+S.length);
- let L=S.filter(s=>s.n.toLowerCase().includes(st.q)&&(st.sit===""||s.s==+st.sit));LL=L;
+ let L=S.filter(s=>(st.q===""||s.n===st.q)&&(st.sit===""||s.s==+st.sit));LL=L;
  document.querySelectorAll("[data-p]").forEach(e=>e.hidden=e.dataset.p!==st.v);
  document.querySelectorAll(".tabs [data-v]").forEach(e=>e.classList.toggle("on",e.dataset.v===st.v));
  const cs=comps(m);
@@ -165,9 +165,10 @@ $("#help").onclick=()=>{$("#mb").innerHTML=`<h3>❓ Como funciona</h3><p><b>Resu
 <p>Escolas sem resultado em um componente ficam fora do cálculo dele (não são tratadas como zero).</p>`;$("#md").classList.add("on")};
 $("#md").onclick=e=>{if(e.target.id==="md"||e.target.classList.contains("x")){$("#md").classList.remove("on");if(ch.c5){ch.c5.destroy();delete ch.c5}}};
 $("#meta").oninput=e=>{const v=parseFloat(e.target.value);if(!isNaN(v)){st.meta=v/100;render()}};
-$("#q").oninput=e=>{st.q=e.target.value.toLowerCase();render()};
+$("#q").onchange=e=>{st.q=e.target.value;render()};
 $("#sit").onchange=e=>{st.sit=e.target.value;render()};
 $("#comp").onchange=e=>{st.comp=e.target.value;render()};
+$("#q").innerHTML+=D.rows.map(r=>r[0]).sort((a,b)=>a.localeCompare(b)).map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join("");
 $("#comp").innerHTML="<option value='geral'>Geral (% de acertos)</option>"+D.comps.map((c,j)=>`<option value="${j}">${c}</option>`).join("");
 $("#reset").onclick=()=>{Object.assign(st,{meta:.51,q:"",sit:"",comp:"geral",key:"rk",dir:1});$("#meta").value=51;$("#q").value="";$("#sit").value="";$("#comp").value="geral";render()};
 render();
