@@ -222,18 +222,21 @@ const CONFIG = {
     turma: "Turma",
     questoes: "Questões"
   },
+
   colunasEscola: {
     turma: "Turma",
     totalAlunos: "Total Alunos",
-    participacao: "Participação",
-    acertos: "% de acertos"
+    participacao: "(%) Participação",
+    acertos: "(%) Acertos"
   },
+
   colunasTurma: {
     ra: "NR RA",
     nome: "Nome",
-    participacao: "% participação",
-    acertos: "% acertos"
+    participacao: "(%) Participação",
+    acertos: "(%) Acertos"
   },
+
   possiveisColunasTurma: [
     "Turma",
     "TURMA",
@@ -241,17 +244,20 @@ const CONFIG = {
     "Turma do aluno",
     "Descrição da Turma"
   ],
+
   colunasQuestoes: {
     turma: "Turma",
     componente: "Componente",
     questao: "Questão",
     descritor: "Descritor",
-    acerto: "% Acerto"
+    acerto: "(%) Acerto"
   },
+
   componentes: [
     "MAT","PORT","ING","HIST","GEO","CIE","FILO","SOC",
     "BIO","FÍS","QUI","FIN","TEC"
   ],
+
   limiteBom: 75,
   limiteAtencao: 50
 };
@@ -318,6 +324,7 @@ function limparTexto(texto){
 function numero(valor){
   if(valor === null || valor === undefined || valor === "") return 0;
   if(typeof valor === "number") return valor;
+
   return parseFloat(
     String(valor)
       .replace("%", "")
@@ -345,6 +352,7 @@ function extrairComponentes(linha, colunaAcertos){
 
   CONFIG.componentes.forEach((comp, i) => {
     const chave = chaves[inicio + 1 + i];
+
     if(chave && linha[chave] !== null && linha[chave] !== undefined){
       resultado[comp] = numero(linha[chave]);
     }
@@ -355,6 +363,7 @@ function extrairComponentes(linha, colunaAcertos){
 
 function detectarColunaTurma(linha){
   const chaves = Object.keys(linha);
+
   return CONFIG.possiveisColunasTurma.find(coluna =>
     chaves.some(chave => limparTexto(chave) === limparTexto(coluna))
   );
@@ -412,6 +421,7 @@ function processarQuestoes(linhas){
 
 function normalizarComponente(valor){
   const texto = limparTexto(valor).toUpperCase();
+
   return CONFIG.componentes.find(comp =>
     limparTexto(comp) === limparTexto(texto)
   ) || texto;
@@ -432,6 +442,7 @@ function mediaPonderadaEscola(campo){
 function mediaTurma(turma, campo){
   const alunos = dados.turmas[turma] || [];
   if(!alunos.length) return 0;
+
   return alunos.reduce((s,a) => s + a[campo], 0) / alunos.length;
 }
 
