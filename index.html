@@ -11,6 +11,12 @@ header{background:#fff;border-bottom:1px solid var(--line);padding:18px 0 0}.w{m
 header h1{margin:0;font-size:clamp(20px,3vw,27px);color:var(--navy)}header p{margin:2px 0 12px;color:var(--mut)}
 .tabs{display:flex;gap:4px;flex-wrap:wrap}.tabs button{background:none;color:var(--mut);border:0;border-bottom:3px solid transparent;border-radius:0;padding:10px 14px;font-weight:700}
 .tabs button.on{color:var(--navy);border-color:var(--blue)}.tabs button:hover{background:#f0f5fb}
+
+/* --- LINKS EXTERNOS --- */
+.ext-links{display:flex;gap:10px;flex-wrap:wrap;padding:12px 0 16px;border-top:1px dashed var(--line);margin-top:2px}
+.ext-links a{background:#f4f7fb;color:var(--navy);text-decoration:none;padding:6px 14px;border-radius:8px;font-size:12px;font-weight:600;border:1px solid var(--line);transition:all .2s;display:flex;align-items:center;gap:6px}
+.ext-links a:hover{background:var(--blue);color:#fff;border-color:var(--blue);transform:translateY(-1px);box-shadow:0 4px 8px #1f38641a}
+
 main{max-width:1280px;margin:0 auto;padding:20px 4vw 50px}
 .bar{display:flex;flex-wrap:wrap;gap:12px;align-items:end;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 16px;margin-bottom:16px;position:sticky;top:8px;z-index:5;box-shadow:0 4px 14px #1f38641a}
 .bar label{display:flex;flex-direction:column;font-size:11px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.04em;gap:4px}
@@ -62,12 +68,22 @@ footer{text-align:center;color:var(--mut);font-size:12px;margin-top:20px}
 <!-- CONTADOR DE PROVAS -->
 <div id="contador" class="cnt">⏳ Sincronizando calendário SEDUC...</div>
 
-<nav class="tabs"><button data-v="painel" class="on">🏠 Painel</button><button data-v="escolas">🏫 Escolas</button><button data-v="comps">📚 Componentes</button><button data-v="mapa">🔥 Mapa de calor</button><button id="help">❓ Como funciona</button><button id="sobre">ℹ️ Sobre</button></nav></div></header>
+<nav class="tabs"><button data-v="painel" class="on">🏠 Painel</button><button data-v="escolas">🏫 Escolas</button><button data-v="comps">📚 Componentes</button><button data-v="mapa">🔥 Mapa de calor</button><button id="help">❓ Como funciona</button><button id="sobre">ℹ️ Sobre</button></nav>
+
+<!-- LINKS EXTERNOS -->
+<div class="ext-links">
+    <a href="https://saladofuturo.educacao.sp.gov.br/sso-gov-servidor" target="_blank">🚀 Sala do Futuro</a>
+    <a href="https://diaval-hub.vercel.app/" target="_blank">📊 DIAVAL</a>
+    <a href="https://escolatotal.educacao.sp.gov.br/" target="_blank">🏫 Escola Total</a>
+    <a href="https://repositorio.educacao.sp.gov.br/" target="_blank">📚 Repositório</a>
+</div>
+
+</div></header>
 <main>
 <div class="bar">
 <label>Meta URE (%)<input id="meta" type="number" step="0.5" min="0" max="100" value="51"></label>
-<label>Escola<select id="q"><option value="">Todas as escolas</option></select></label>
 <label>Situação<select id="sit"><option value="">Todas</option><option value="0">Acima da Meta</option><option value="1">Próxima da Meta</option><option value="2">Atenção</option><option value="3">Alta Prioridade</option></select></label>
+<label>Escola<select id="q"><option value="">Todas as escolas</option></select></label>
 <label>Base de análise<select id="comp"></select></label>
 <button id="reset">Limpar filtros</button></div>
 <div id="ctx"></div>
@@ -105,7 +121,7 @@ const eventosProvas = [
   { nome: "SARESP (6º EF)", data: new Date("2026-11-18T08:00:00-03:00").getTime() },
   { nome: "SARESP (5º EF)", data: new Date("2026-11-23T08:00:00-03:00").getTime() },
   { nome: "SARESP (2º EF - Port)", data: new Date("2026-11-25T08:00:00-03:00").getTime() },
-  { nome: "SARESP (7º EF)", data: new Date("2026-11-26T08:00:00-03:00").getTime() },
+  { nome: "SARESP (7º EF/Mat 2º EF)", data: new Date("2026-11-26T08:00:00-03:00").getTime() },
   { nome: "SARESP (8º EF)", data: new Date("2026-11-30T08:00:00-03:00").getTime() }
 ];
 
@@ -154,6 +170,7 @@ const lbl={id:"lbl",afterDatasetsDraw(c){if(c.config.type!=="bar")return;const x
 function mk(id,cfg){const el=$("#"+id);if(!el)return;if(typeof Chart==="undefined"){el.parentNode.innerHTML="<p class='sub'>Não foi possível carregar a biblioteca de gráficos (verifique a conexão com a internet).</p>";return}
  if(ch[id])ch[id].destroy();cfg.plugins=[lbl];cfg.options=Object.assign({responsive:true,maintainAspectRatio:false},cfg.options);ch[id]=new Chart(el,cfg)}
 const tickP=v=>v+"%";
+
 function calc(){
  const ci=st.comp==="geral"?-1:+st.comp;
  const S=D.rows.map(r=>({n:r[0],a:r[1],p:r[2],g:r[3],c:r[4],v:ci<0?r[3]:r[4][ci]})).filter(s=>s.v!=null);
@@ -162,15 +179,31 @@ function calc(){
  const ord=S.filter(s=>s.i>0).sort((x,y)=>y.i-x.i);ord.forEach((s,k)=>s.rk=k+1);
  return{S,T,ure:S.reduce((x,s)=>x+s.a*s.v,0)/T,ord};
 }
+
 const kpi=(l,v)=>`<div class="kpi"><small>${l}</small><b>${v}</b></div>`;
+
 function comps(m){return D.comps.map((c,j)=>{const x=D.rows.filter(r=>r[4][j]!=null),t=x.reduce((a,r)=>a+r[1],0);
  const v=x.reduce((a,r)=>a+r[1]*r[4][j],0)/t;return{j,c,v,cov:t/TA,s:sit(v,m)}}).sort((a,b)=>a.v-b.v)}
 let LL=[];
 const pp=v=>(Math.abs(v)*100).toLocaleString(N,{minimumFractionDigits:2,maximumFractionDigits:2})+" p.p.";
+
 function pick(n){st.q=n;$("#q").value=n;st.v="painel";render();scrollTo(0,0)}
+
 function render(){
  const {S,T,ure,ord}=calc(),m=st.meta,cs=comps(m);
  const base=st.comp==="geral"?"Geral":D.comps[+st.comp];
+
+ // --- FILTRO DINÂMICO DE ESCOLAS POR SITUAÇÃO ---
+ const validS = st.sit === "" ? S : S.filter(s => String(s.s) === st.sit);
+ const validNames = validS.map(s => s.n).sort((a,b) => a.localeCompare(b));
+ $("#q").innerHTML = `<option value="">Todas as escolas (${validNames.length})</option>` + validNames.map(n => `<option value="${esc(n)}">${esc(n)}</option>`).join("");
+ if (validNames.includes(st.q)) {
+     $("#q").value = st.q;
+ } else {
+     st.q = ""; 
+ }
+ // ------------------------------------------------
+
  const raw=st.q?D.rows.find(r=>r[0]===st.q):null,me=raw?S.find(s=>s.n===st.q):null;
  if(raw){const dif=me?me.v-ure:0;
   $("#ctx").className="ctx sch";
@@ -279,8 +312,10 @@ $("#meta").oninput=e=>{const v=parseFloat(e.target.value);if(!isNaN(v)){st.meta=
 $("#q").onchange=e=>{st.q=e.target.value;render()};
 $("#sit").onchange=e=>{st.sit=e.target.value;render()};
 $("#comp").onchange=e=>{st.comp=e.target.value;render()};
-$("#q").innerHTML+=D.rows.map(r=>r[0]).sort((a,b)=>a.localeCompare(b)).map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join("");
+
+// Dropdown de componentes carrega apenas uma vez:
 $("#comp").innerHTML="<option value='geral'>Geral (% de acertos)</option>"+D.comps.map((c,j)=>`<option value="${j}">${c}</option>`).join("");
-$("#reset").onclick=()=>{Object.assign(st,{meta:.51,q:"",sit:"",comp:"geral",key:"rk",dir:1});$("#meta").value=51;$("#q").value="";$("#sit").value="";$("#comp").value="geral";render()};
-render();
+
+$("#reset").onclick=()=>{Object.assign(st,{meta:.51,q:"",sit:"",comp:"geral",key:"rk",dir:1});$("#meta").value=51;$("#sit").value="";$("#comp").value="geral";render()};
+render(); // A renderização inicial já preenche o Select #q corretamente
 </script></body></html>
