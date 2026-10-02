@@ -6,22 +6,15 @@
   <title>Jornada da Prova Paulista — Painel da URE</title>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <script src="data/prova-paulista-3bim-2026.js"></script>
+  <script src="data/dados.js"></script>
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
 
 <header>
   <div class="w">
-    <h1>🎓 Jornada da Prova Paulista — <span id="titulo-bimestre">3º Bimestre</span></h1>
+    <h1>🎓 Jornada da Prova Paulista — 3º Bimestre</h1>
     <p>Painel da Unidade Regional de Ensino · prioridades por impacto no resultado regional</p>
-
-    <div class="meta-base">
-      <span><strong>Fonte:</strong> <span id="meta-fonte"></span></span>
-      <span><strong>Base:</strong> <span id="meta-base"></span></span>
-      <span><strong>Extração:</strong> <span id="meta-extracao"></span></span>
-      <span><strong>Atualização:</strong> <span id="meta-atualizacao"></span></span>
-    </div>
 
     <nav class="tabs">
       <button data-v="painel" class="on">🏠 Painel</button>
@@ -29,6 +22,7 @@
       <button data-v="comps">📚 Componentes</button>
       <button data-v="mapa">🔥 Mapa de calor</button>
       <button id="help">❓ Como funciona</button>
+      <button id="sobre">ℹ️ Sobre</button>
     </nav>
   </div>
 </header>
@@ -163,7 +157,10 @@
     </div>
   </section>
 
-  <footer id="rodape"></footer>
+  <footer>
+    Dados: Escola Total / SEDUC-SP · Resultado URE = média ponderada por alunos · escolas sem resultado no componente ficam fora do cálculo.<br>
+    Desenvolvido por Luciano Julio da Silva — PEC Desenvolvimento Curricular de Tecnologia, URE São José do Rio Preto · com auxílio de Inteligência Artificial (Perplexity AI, 2026).
+  </footer>
 </main>
 
 <div class="md" id="md">
